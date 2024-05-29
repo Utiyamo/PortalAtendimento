@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongo:27017/crawler
+      - DB_NAME=crawler
+      - JWT_SECRET=OTljZmRiODEtYzMzZS00Mjk2LWE0MjEtM2QxMTM2NjIyNjI2Cgo0ZWFjMTgxMi1jMzQzLTRmZjEtODA5Yi1lYzkxNzJiNjE4OWEKCjNkZDBjNzQxLTA0OTctNDhiYy04Y2VlLTljOTg5MjExNWEzZAoKZWE1YTllNmItN2Y4OC00NTkwLWExNjctNTA0MWE1NWFhOTUzCgoyN2E2MGE2NC0yOWE3LTQwNmEtYTkxMC03NmVhN2NjYzlmOTAKCmYwNTI0ZTVlLTkwN2QtNDgwNy04MGMwLTVjMjMzZmE3NDA1NQoKYTY4ZGRiYjEtMzkyMS00ZWY1LThlMWMtOTBiNDJjNzllZDNmCgo3MTczNjc3YS1mOTlmLTQyODItOGUyYi1iNmU0MmNkZjVhNzgKCjU2ZTJmMTMzLWM2MmYtNGYxMS04YTQ3LTY5NjJmMWNhYTZhZQoKYjUyOGU3NWItN2FkZC00ODYwLTkxMmItMTA0OTdjMTA5MGUzCgo0NGU3MzlmZS1hZDBlLTQ5ODctOGRiMC03NTZlMWU1MGM3MDMKCjQ1ZmRkNGFlLTI1NWItNGNiMS1hMTgwLWJjOWU1MzFkNjViMwoKOThlNmFjNjgtNjc3Yi00YWM0LWE5MTItOTVkMTYyMGZhNmM0CgpjNzliYjdkZi01MWVjLTQxZGUtOGRlNC1kMmUyZDRjMjljYTkKCjY1N2EwN2VmLTczMTQtNGY1NS05NjAzLTQ1ZmM0OTJjOTIwZQoKZTU1ZTMwOTQtNjQ4OC00ZWRkLWI5NzAtZDcwNjlhYjE5YzJjCgpjMmRiYWJkMC1iMGJhLTQ1ZWUtYWVlNC01NGZkNWU2NmIxYjcKCjkxNjg5OWMzLWYwOWUtNDQ0Yy04ZjI4LTA5OTg1ZGNlZDFhMwoKMmI0MGZjOTctZDZhYy00OWE1LTk3ODQtNzdhMzdhZDE2Mzg4CgpjNTkxNDA1OS1lZjdmLTRiYTUtYWFhOS03NmNjNWU4MTJhNzc=
+      - PORT=3000
+    volumes:
+      - ./backend:/app
+      - ./backend/migrations:/app/migrations
+    ports:
+      - "5000:3000"
+    depends_on:
+      - mongo
+
+  frontend:
+    build:
+      context: ./frontend-crawler
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./frontend-crawler:/app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
