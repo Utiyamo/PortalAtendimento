@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const cors = require("cors");
 
 class Server{
     constructor(){
@@ -18,6 +19,10 @@ class Server{
     middlewares() {
         this.app.use(bodyParser.json());
         this.app.use(express.urlencoded({ extended: false }));
+        this.app.use(cors({
+            origin: 'http://localhost:3000',
+            credentials: true
+        }))
     }
 
     routes() {
