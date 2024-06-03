@@ -22,11 +22,12 @@ router.get('/', (req, res, next) => {
 router.post('/auth', authController.login);
 
 //User
-router.post('/users', validateUser, authenticateJWT, AuthorizeModule.init(['create_user']), userController.createUser);
-router.get('/users/:id',authenticateJWT, AuthorizeModule.init(['read_user']), userController.getUser);
-router.get('/users',authenticateJWT, AuthorizeModule.init(['read_user']), userController.getAllUsers);
-router.put('/users/:id', validateUser, authenticateJWT, AuthorizeModule.init(['update_user']), userController.updateUser);
-router.delete('/users/:id',authenticateJWT, AuthorizeModule.init(['delete_user']), userController.deleteUser);
+router.post('/users', validateUser, AuthorizeModule.init(['create_user']), userController.createUser);
+router.get('/users/:id', AuthorizeModule.init(['read_user']), userController.getUser);
+router.get('/users/external/:id', AuthorizeModule.init(['read_user']), userController.getUserExternal);
+router.get('/users', AuthorizeModule.init(['read_user']), userController.getAllUsers);
+router.put('/users/:id', validateUser, AuthorizeModule.init(['update_user']), userController.updateUser);
+router.delete('/users/:id', AuthorizeModule.init(['delete_user']), userController.deleteUser);
 
 // Enterprise routes
 router.post('/enterprises',validateEnterprise, authenticateJWT, AuthorizeModule.init(['manage_enterprises']), enterpriseController.createEnterprise);

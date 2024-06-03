@@ -1,5 +1,7 @@
 const User = require('../models/Entities/UserEntity');
 const jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+dotenv.config();
 
 class AuthorizeModule {
     constructor(requiredPermissions){
@@ -9,7 +11,11 @@ class AuthorizeModule {
     async authorize(req, res, next){
         try {
             const token = req.headers.authorization.split(' ')[1];
-            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            if (!token) {
+                return res.status(401).send({ error: 'No token provided' });
+            }
+
+            const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your_jwt_secret_key');
             req.user = decoded;
 
             const user = await User.findById(req.user.id).populate('roles');
@@ -27,6 +33,12 @@ class AuthorizeModule {
 
             next();
         } catch (error) {
+            if (error.name === 'TokenExpiredError') {
+                return res.status(401).send({ error: 'Token expired' });
+            }
+            if (error.name === 'JsonWebTokenError') {
+                return res.status(401).send({ error: 'Invalid token' });
+            }
             res.status(500).send({ error: 'Internal Server Error' });
         }
     }

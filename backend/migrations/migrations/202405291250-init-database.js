@@ -20,7 +20,7 @@ module.exports = {
       roles: [], // Roles will be added after role insertion
       CreationDate: new Date(),
       blocked: false,
-      _externalID: 'admin-external-id',
+      externalID: 'admin-external-id',
       enterprises: []
     };
 

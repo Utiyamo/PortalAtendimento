@@ -21,12 +21,12 @@ services:
 
   frontend:
     build:
-      context: ./frontend-crawler
+      context: ./frontend
       dockerfile: Dockerfile
     environment:
       - NODE_ENV=development
     volumes:
-      - ./frontend-crawler:/app
+      - ./frontend:/app
     ports:
       - "3000:3000"
     depends_on:

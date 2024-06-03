@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
-    _externalID: {
-        type: mongoose.Schema.Types.UUID,
+    externalID: {
+        type: String,
         required: true
     },
     name: {

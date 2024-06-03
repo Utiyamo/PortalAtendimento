@@ -6,38 +6,46 @@ const Enterprise = require('../models/Entities/EnterpriseEntity');
 
 const { generateToken } = require('../middleware/authenticator');
 
-class AuthController{
+class AuthController {
 
-    async login(req, res, next){
+    async login(req, res, next) {
         const { email, password } = req.body;
 
-        try{
+        try {
             const user = await User.findOne({ email });
 
-            if(!user)
-                return res.status(404).send({ error: "Invalid E-mail or Password"});
+            if (!user)
+                return res.status(404).send({ error: "Invalid E-mail or Password" });
 
-            const roles = await Role.find({ _id: { $in: user.roles }});
-            const enterprises =  await Enterprise.find({ _id: { $in: user.enterprises}});
+            const roles = await Role.find({ _id: { $in: user.roles } });
+            const enterprises = await Enterprise.find({ _id: { $in: user.enterprises } });
 
             const isMatch = await bcrypt.compare(password, user.password);
-            if(!isMatch)
-                return res.status(401).send({ error: "invalid E-mail or Password"});
+            if (!isMatch)
+                return res.status(401).send({ error: "invalid E-mail or Password" });
 
             const token = generateToken(user);
-            res.send({ 
+
+            // Set a cookie
+            res.cookie('token', token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+                sameSite: 'lax',
+            });
+
+            res.send({
                 user: {
                     email: user.email,
                     name: user.name,
-                    id: user._externalID,
+                    id: user.externalID,
                     roles: roles,
                     enterprises: enterprises
                 },
                 token: token
-             });
+            });
             return next();
         }
-        catch(err){
+        catch (err) {
             return res.status(500).send({ error: err.message });
         }
     }
