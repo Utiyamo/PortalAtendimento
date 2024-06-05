@@ -24,7 +24,7 @@ class EnterpriseController{
             console.log("Start usersIds ", usersIds );
 
             const enterprise = new Enterprise({
-                _externalID: uuidv4(),
+                externalID: uuidv4(),
                 name,
                 users: usersIds.map(user => user._id)
             });
@@ -48,11 +48,54 @@ class EnterpriseController{
         }
     }
 
+    async insertUser(req, res, next){
+        try{
+            if(!req.query.user)
+                return res.status(400).send({ error: "Invalid User"});
+
+            const user = await User.findOne({ externalID: req.query.user});
+            if(!user)
+                return res.status(400).send({ error: "User not found. Request are invalid"});
+
+            const enterprise = await Enterprise.findOne({ externalID: req.params.id}).populate({ path: "user", populate: "users", strictPopulate: false });
+            if(!enterprise)
+                return res.status(404).send({ error: "Enterprise not found"});
+
+            console.log(enterprise.Users);
+
+            let existsUser = enterprise.Users.filter(e => {
+                if(e.externalID == req.query.user)
+                    return e;
+            });
+            if(existsUser.length > 0)
+                return res.status(400).send({ error: "The user arready registrated in Enterprise"});
+
+            enterprise.Users.push(user._id);
+
+            if (enterprise.Users.length) {
+                await User.updateMany(
+                    { _id: { $in: enterprise.Users } },
+                    { $addToSet: { enterprises: enterprise._id } }
+                );
+            }
+
+            await Enterprise.updateOne({externalID: req.params.id}, enterprise, { new: true});
+
+            res.status(200).send(enterprise);
+            return next();
+        }
+        catch(err){
+            return res.status(500).send({ error: err.message });
+        }
+    }
+
     async getEnterprise(req, res, next){
         try{
-            const enterprise = await Enterprise.findById(req.param.id).populate('users');
-            if(enterprise)
+            const enterprise = await Enterprise.findById(req.params.id).populate({ path: "users", populate: "user", strictPopulate: false });
+            if(!enterprise)
                 return res.status(404).send({ error: "Enterprise not found"});
+
+            console.log(enterprise.Users);
 
             res.send(enterprise);
             return next();

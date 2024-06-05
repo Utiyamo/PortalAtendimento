@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const enterpriseSchema = new mongoose.Schema({
-    _externalID: {
+    externalID: {
         type: mongoose.Schema.Types.UUID,
         required: true,
         unique: true

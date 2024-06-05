@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
 import UserService from "@/services/userService";
+import UserProfile from "./UserProfile";
 
 export default async function Profile() {
   const cookieStore = cookies();
@@ -22,8 +23,8 @@ export default async function Profile() {
   if (response.isSuccess) {
     return (
       <>
-        <h1>Profile</h1>
-        <pre>{response.data.name}</pre>
+        <h1 className="font-bold text-5xl mb-6 ">Profile</h1>
+        <UserProfile userInfo={response.data}></UserProfile>
       </>
     );
   } 
